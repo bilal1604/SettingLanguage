@@ -4,11 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.net.toUri
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -94,14 +91,5 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun openAppOrStore(packageName: String, storeUrl: String) {
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        if (intent != null) {
-            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, "Aplikasi tidak ditemukan.", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(Intent.ACTION_VIEW, storeUrl.toUri()))
-        }
-    }
+
 }
