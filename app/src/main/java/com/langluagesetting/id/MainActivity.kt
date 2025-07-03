@@ -1,139 +1,107 @@
 package com.langluagesetting.id
+
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
+import androidx.core.net.toUri
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var adView: AdView
+    private lateinit var adView1: AdView
+    private lateinit var adView2: AdView
+    private var interstitialAd: InterstitialAd? = null
+    private lateinit var adRequest: AdRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_main)
 
-        // Inisialisasi AdView
+        // Inisialisasi iklan
+        MobileAds.initialize(this)
+
+        // Siapkan permintaan iklan
+        adRequest = AdRequest.Builder().build()
+
+        // Load iklan interstitial
+        loadInterstitialAd()
+
+        // Inisialisasi dan load banner
         adView = findViewById(R.id.adView)
+        adView1 = findViewById(R.id.adView1)
+        adView2 = findViewById(R.id.adView2)
 
-        // Buat permintaan iklan
-        val adRequest = AdRequest.Builder().build()
-
-        // Muat iklan ke dalam AdView
         adView.loadAd(adRequest)
+        adView1.loadAd(adRequest)
+        adView2.loadAd(adRequest)
 
-        val button_start = findViewById<Button>(R.id.startbutton)
-        button_start.setOnClickListener {
-            startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+        // Tombol start
+        val buttonStart = findViewById<Button>(R.id.startbutton)
+        buttonStart.setOnClickListener {
+            if (interstitialAd != null) {
+                interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+                        interstitialAd = null
+                        loadInterstitialAd() // reload setelah ditutup
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                        startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+                        interstitialAd = null
+                        loadInterstitialAd() // reload walau gagal
+                    }
+                }
+                interstitialAd?.show(this)
+            } else {
+                startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+                loadInterstitialAd() // reload jika belum tersedia
+            }
         }
 
-        val button_wa = findViewById<ImageView>(R.id.whatshap)
-        button_wa.setOnClickListener {
-            openWhatsApp()
-        }
+            }
 
-        val button_ig = findViewById<ImageView>(R.id.ig)
-        button_ig.setOnClickListener {
-            openInstagram()
-        }
+    private fun loadInterstitialAd() {
+        InterstitialAd.load(
+            this,
+            "ca-app-pub-8604728728100888/1036434163", // ganti dengan ID asli jika di produksi
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                }
 
-        val button_tw = findViewById<ImageView>(R.id.twiter)
-        button_tw.setOnClickListener {
-            openTwitter()
-        }
-
-        val button_yt = findViewById<ImageView>(R.id.yt)
-        button_yt.setOnClickListener {
-            openYouTube()
-        }
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    interstitialAd = null
+                }
+            }
+        )
     }
 
     override fun onDestroy() {
-        // Hentikan pemuatan iklan saat activity dihancurkan
         adView.destroy()
+        adView1.destroy()
+        adView2.destroy()
         super.onDestroy()
     }
 
-    private fun openWhatsApp() {
-        val packageName = "com.whatsapp"
-        val packageManager = packageManager
-
+    private fun openAppOrStore(packageName: String, storeUrl: String) {
         val intent = packageManager.getLaunchIntentForPackage(packageName)
         if (intent != null) {
             intent.addCategory(Intent.CATEGORY_LAUNCHER)
             startActivity(intent)
         } else {
-            val errorMessage = "Whatshapp app is not installed on your device."
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-
-            val playStoreLink = "https://play.google.com/store/apps/details?id=com.whatsapp"
-            val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse(playStoreLink))
-            startActivity(playStoreIntent)
-        }
-    }
-
-    private fun openYouTube() {
-        val packageName = "com.google.android.youtube"
-        val packageManager = packageManager
-
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        if (intent != null) {
-            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-            startActivity(intent)
-        } else {
-            // Aplikasi YouTube tidak terpasang, buka tautan Play Store untuk mengunduh.
-            val errorMessage = "Youtube app is not installed on your device."
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-
-            val playStoreLink = "https://play.google.com/store/apps/details?id=com.google.android.youtube"
-            val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse(playStoreLink))
-            startActivity(playStoreIntent)
-        }
-    }
-
-
-    private fun openInstagram() {
-        val packageName = "com.instagram.android"
-        val packageManager = packageManager
-
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        if (intent != null) {
-            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-            startActivity(intent)
-        } else {
-            // Instagram tidak terpasang, Anda bisa memberikan pilihan lain atau pesan error.
-            val errorMessage = "Instagram app is not installed on your device."
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-
-            val playStoreLink = "https://play.google.com/store/apps/details?id=com.instagram.android"
-            val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse(playStoreLink))
-            startActivity(playStoreIntent)
-        }
-    }
-
-    private fun openTwitter() {
-        val packageName = "com.twitter.android" // Package name untuk aplikasi Twitter
-        val packageManager = packageManager
-
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        if (intent != null) {
-            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-            startActivity(intent)
-        } else {
-            // Aplikasi Twitter tidak terpasang, Anda bisa memberikan pilihan lain atau pesan error.
-            val errorMessage = "Twitter app is not installed on your device."
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-
-            val playStoreLink = "https://play.google.com/store/apps/details?id=com.twitter.android"
-            val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse(playStoreLink))
-            startActivity(playStoreIntent)
+            Toast.makeText(this, "Aplikasi tidak ditemukan.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(Intent.ACTION_VIEW, storeUrl.toUri()))
         }
     }
 }

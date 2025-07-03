@@ -7,11 +7,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
+        <!-- Kontainer untuk dua AdView -->
+        <LinearLayout
+            android:id="@+id/adContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentTop="true">
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:adSize="BANNER"
+                app:adUnitId="ca-app-pub-8604728728100888/8748349796" />
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:adSize="BANNER"
+                app:adUnitId="ca-app-pub-8604728728100888/8748349796" />
+        </LinearLayout>
+
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/startbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="START"
+        android:text="@string/start"
         android:textColor="@color/white"
         android:background="@drawable/bg_btn"
         android:layout_centerInParent="true" />
@@ -21,23 +46,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:text="@string/click_start_to_continue"
         android:layout_below="@id/startbutton"
         android:layout_centerInParent="true"
         android:textStyle="bold"/>
 
-    <TextView
-        android:layout_marginTop="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#7A7373"
-        android:text="Quick App Opening  "
-        android:textSize="12sp"
-        android:layout_marginBottom="10dp"
-        android:layout_above="@id/Linear_app"
-        android:layout_centerInParent="true"
-        android:textStyle="bold"/>
 
     <LinearLayout
         android:id="@+id/Linear_app"
@@ -47,30 +61,6 @@
         android:gravity="center"
         android:layout_marginBottom="10dp"
         android:layout_above="@id/adView">
-
-        <ImageView
-            android:id="@+id/whatshap"
-            android:layout_width="80dp"
-            android:layout_height="60dp"
-            android:src="@drawable/wa"/>
-
-        <ImageView
-            android:id="@+id/ig"
-            android:layout_width="80dp"
-            android:layout_height="60dp"
-            android:src="@drawable/ig"/>
-        <ImageView
-            android:id="@+id/twiter"
-            android:layout_width="80dp"
-            android:layout_height="60dp"
-            android:src="@drawable/tw"/>
-
-        <ImageView
-            android:id="@+id/yt"
-            android:layout_width="80dp"
-            android:layout_height="60dp"
-            android:src="@drawable/yt"/>
-
 
 
     </LinearLayout>
